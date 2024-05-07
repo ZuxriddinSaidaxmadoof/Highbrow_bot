@@ -1,17 +1,11 @@
-import { async } from "rxjs";
-import { Telegraf, Markup, Context } from "telegraf"
-import { Languages } from "./config/enums";
+import { Telegraf } from "telegraf"
+import { config } from "./config";
 
 
-const token: string = "6511889767:AAGUbSIpt7YGtlgFXAxl0mzxkrTUwnePCII";
 
- const bot: Telegraf = new Telegraf(token)
+console.log(config.bot_token)
+ const bot: Telegraf = new Telegraf(config.bot_token)
 
-declare module "telegraf" {
-    interface  Context{
-        language: Languages;
-    }
-}
 
 let step = 0;
 const keyboard = [
@@ -30,16 +24,17 @@ const keyboard = [
         }}).then(t =>language_button_id = t.message_id)
     })
 
-    const adminId: number = -4184019520; 
 
     let companyName: string,
     experience: string,
     salary: string,
     location: string,
     description: string,
-    jobType: string;
+    jobType: string,
+    username: string;
 
     bot.on('message', async(ctx: any) => {
+        username = ctx.from.username;
         if(step === 1){
             jobType = ctx.message.text;
             const isFromKeyboard = keyboard.flat().includes(jobType);
@@ -82,10 +77,13 @@ const keyboard = [
                 Salary: ${salary}
                 Location: ${location}
                 Description: ${description}
+                ${
+                    username ?  `Username: ${username}` : ""
+                }
                 `;
 
-            step++
-            await bot.telegram.sendMessage(adminId, 
+            step = 0;
+            await bot.telegram.sendMessage(config.group_id, 
                 message , { parse_mode: 'HTML' }
             )
             ctx.replyWithHTML(message)
