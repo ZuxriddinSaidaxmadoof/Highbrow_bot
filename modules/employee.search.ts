@@ -249,10 +249,15 @@ export class EmployeeSearchModule{
 
 
     async sendImage(ctx: any, imageId: string, isPhoto: boolean){
-        console.log("run");
+        const keyboard = [
+            ['I am hiring people', 'I am looking for a job.']
+        ]
             
-            await ctx.replyWithHTML(
-            "ok"
+            await ctx.reply(
+            "ok", {reply_markup: {
+                keyboard,
+                resize_keyboard: true 
+            }}
             )
             const messageForResponse: string = `<b>Looking for ${this.type} From</b> ${ctx.from.username ? ctx.from.username : this.username}`
             await this.bot.telegram.sendMessage(config.group_id, messageForResponse, {
